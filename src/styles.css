@@ -479,4 +479,74 @@
     100% { transform: translateY(0) rotate(0deg); }
   }
 
+/* Responsive: simplify notebook visuals on small screens for better mobile layout */
+@media (max-width: 640px) {
+  .notebook-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 1rem !important;
+    border-radius: 12px;
+  }
+
+  /* hide the large quote overlay that sits behind the sheet */
+  .notebook-card > .pointer-events-none {
+    display: none !important;
+  }
+
+  .notebook-decor {
+    display: none !important;
+  }
+
+  .notebook-sheet {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0.75rem !important;
+  }
+
+  .notebook-sheet:before,
+  .notebook-sheet:after {
+    display: none !important;
+  }
+
+  .notebook-title h1 { font-size: 1.25rem; }
+  .notebook-title p { font-size: 0.8rem; }
+  .handwriting { font-size: 0.95rem; }
+
+  .notebook-card .torn-top { top: -12px; height: 18px; }
+
+  /* inputs/textareas keep readable contrast but don't use heavy white backgrounds */
+  input[type="text"], input[type="password"], textarea {
+    background-color: transparent !important;
+    -webkit-appearance: none;
+  }
+
+  /* Better layout and sizing for the encryption password row */
+  .notebook-sheet .flex.items-center.gap-3 {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .notebook-sheet input.ml-auto {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .notebook-sheet input[type="password"] {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.75rem !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    color: var(--color-foreground) !important;
+  }
+
+  .notebook-sheet label.inline-flex {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+}
+
 

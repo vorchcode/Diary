@@ -1,9 +1,18 @@
 let ctx: AudioContext | null = null;
+let masterGain: GainNode | null = null;
 
 function ensureCtx() {
   if (!ctx) {
     try {
       ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // create a master gain for SFX so we can raise/lower SFX relative to music
+      try {
+        masterGain = ctx.createGain();
+        masterGain.gain.value = 0.9; // louder by default
+        masterGain.connect(ctx.destination);
+      } catch (e) {
+        masterGain = null;
+      }
     } catch (e) {
       ctx = null;
     }
@@ -19,14 +28,17 @@ export function playBubble() {
   o.type = 'triangle';
   o.frequency.value = 420;
   o.connect(g);
-  g.connect(c.destination);
+  // route through masterGain when available so music and sfx mix cleanly
+  if (masterGain) g.connect(masterGain);
+  else g.connect(c.destination);
   const now = c.currentTime;
   g.gain.setValueAtTime(0.0001, now);
-  g.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+  // increase peak gain so bubble is more audible over music
+  g.gain.exponentialRampToValueAtTime(0.5, now + 0.01);
   o.frequency.exponentialRampToValueAtTime(700, now + 0.12);
-  g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
   o.start(now);
-  o.stop(now + 0.26);
+  o.stop(now + 0.3);
 }
 
 export function playPetal() {
@@ -40,19 +52,22 @@ export function playPetal() {
   o.frequency.value = 880;
   o2.frequency.value = 1320;
   const mix = c.createGain();
-  mix.gain.value = 0.6;
+  // louder mix so petal is clearly heard over background music
+  mix.gain.value = 1.0;
   o.connect(mix);
   o2.connect(mix);
   mix.connect(g);
-  g.connect(c.destination);
+  if (masterGain) g.connect(masterGain);
+  else g.connect(c.destination);
   const now = c.currentTime;
   g.gain.setValueAtTime(0.0001, now);
-  g.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+  // slightly stronger and longer tail for petal
+  g.gain.exponentialRampToValueAtTime(0.28, now + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
   o.start(now);
   o2.start(now);
-  o.stop(now + 0.52);
-  o2.stop(now + 0.52);
+  o.stop(now + 0.6);
+  o2.stop(now + 0.6);
 }
 
 export function playBreath(phase: "in" | "out" | "hold", durationSeconds: number) {
